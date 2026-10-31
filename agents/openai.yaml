@@ -1,0 +1,7 @@
+interface:
+  display_name: "Aghuter"
+  short_description: "Turn coding requests into clear, reusable CLI tasks"
+  default_prompt: "Use Aghuter to translate my goal into a readable, explainable workflow. Inspect the project first and ask before risky or external actions."
+
+policy:
+  allow_implicit_invocation: true

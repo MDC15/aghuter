@@ -1,0 +1,28 @@
+# Copy this file to your project as tasks.toml, then review and adapt it.
+# Do not assume these commands fit your project or package manager.
+
+[project]
+name = "example-project"
+
+[tasks.git-status]
+description = "Show the current Git working-tree status."
+command = ["git", "status", "--short"]
+risk = "read"
+cwd = "."
+timeout_seconds = 30
+
+[tasks.git-diff-summary]
+description = "Summarize tracked-file changes without printing the full diff."
+command = ["git", "diff", "--stat"]
+risk = "read"
+cwd = "."
+timeout_seconds = 30
+
+# Uncomment and adapt only after checking the project's package.json scripts.
+# Project scripts can execute arbitrary project code, so they are classified as write.
+# [tasks.test]
+# description = "Run the project's configured test suite."
+# command = ["npm", "test"]
+# risk = "write"
+# cwd = "."
+# timeout_seconds = 900

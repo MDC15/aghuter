@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "name": "Aghuter workflow catalogue",
+  "workflows": [
+    {
+      "id": "project.inspect",
+      "aliases": [
+        "inspect",
+        "project",
+        "understand-project"
+      ],
+      "title": "Inspect a project",
+      "summary": "Build a compact, evidence-based picture of the repository before changing it.",
+      "risk": "read-only",
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Find the repository root and read applicable project/agent instructions."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Identify language, framework, package manager, entry points, and documented scripts from manifests and README files."
+        },
+        {
+          "kind": "command",
+          "purpose": "Check the current Git branch and worktree without modifying it.",
+          "argv": [
+            "git",
+            "status",
+            "--short",
+            "--branch"
+          ],
+          "risk": "read-only"
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Summarize the relevant architecture, current changes, and likely files to inspect next."
+        }
+      ]
+    },
+    {
+      "id": "git.review",
+      "aliases": [
+        "review",
+        "diff",
+        "review-changes"
+      ],
+      "title": "Review Git changes",
+      "summary": "Inspect staged, unstaged, and untracked changes without changing the worktree.",
+      "risk": "read-only",
+      "steps": [
+        {
+          "kind": "command",
+          "purpose": "Show branch and working-tree state.",
+          "argv": [
+            "git",
+            "status",
+            "--short",
+            "--branch"
+          ],
+          "risk": "read-only"
+        },
+        {
+          "kind": "command",
+          "purpose": "Summarize unstaged changes.",
+          "argv": [
+            "git",
+            "diff",
+            "--stat"
+          ],
+          "risk": "read-only"
+        },
+        {
+          "kind": "command",
+          "purpose": "Check unstaged diff whitespace errors.",
+          "argv": [
+            "git",
+            "diff",
+            "--check"
+          ],
+          "risk": "read-only"
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Inspect staged and unstaged diffs separately, then review untracked filenames. Do not assume untracked files are safe to add."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Report findings by severity and cite affected paths/lines where possible."
+        }
+      ]
+    },
+    {
+      "id": "tests.run",
+      "aliases": [
+        "test",
+        "tests",
+        "run-tests"
+      ],
+      "title": "Run relevant tests",
+      "summary": "Discover the project's test command and run the smallest useful test set first.",
+      "risk": "local-execution",
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Inspect project instructions, manifests, lockfiles, and documented test scripts."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Select targeted tests relevant to the changed behavior; do not guess the package manager or test runner."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Run the selected test command, capture its exit status, and report exact scope."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Run broader tests only when proportionate; distinguish not-run from passed."
+        }
+      ]
+    },
+    {
+      "id": "quality.check",
+      "aliases": [
+        "quality",
+        "lint",
+        "typecheck",
+        "verify"
+      ],
+      "title": "Run quality checks",
+      "summary": "Find and run project-defined lint, type, format, and build checks that apply to the change.",
+      "risk": "local-execution",
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Discover available lint, type-check, formatter, and build scripts in project configuration."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Choose checks relevant to the edited files and invoke them separately when their failure causes differ."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Report pass/fail/skip for each check; do not silently install missing tooling."
+        }
+      ]
+    },
+    {
+      "id": "commit.prepare",
+      "aliases": [
+        "prepare-commit",
+        "commit",
+        "stage-commit"
+      ],
+      "title": "Prepare a focused commit",
+      "summary": "Review and propose a focused commit; stage and commit only within the user's authorized scope.",
+      "risk": "local-write",
+      "steps": [
+        {
+          "kind": "command",
+          "purpose": "Inspect all tracked and untracked changes before selecting files.",
+          "argv": [
+            "git",
+            "status",
+            "--short",
+            "--branch"
+          ],
+          "risk": "read-only"
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Review diffs and group related files. Exclude unrelated, generated, local, and secret-bearing files."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Present the exact proposed file list and commit message before staging if the scope is not already explicit."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Stage only reviewed paths, inspect the staged diff, and commit only when the user's request authorizes the commit."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Pushing is a separate external action; never infer permission to push from permission to commit."
+        }
+      ]
+    },
+    {
+      "id": "release.prepare",
+      "aliases": [
+        "release",
+        "prepare-release",
+        "ship-check"
+      ],
+      "title": "Prepare a release checklist",
+      "summary": "Assess release readiness without tagging, publishing, pushing, or deploying.",
+      "risk": "read-only-unless-checks-execute",
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Inspect branch/worktree state, versioning files, changelog, release docs, and CI status."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Discover the repository's documented build and release validation steps."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Run appropriate local checks and produce a release checklist with blockers."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Tagging, pushing, publishing, and deploying require separate explicit authorization for the exact target."
+        }
+      ]
+    },
+    {
+      "id": "dependency.audit",
+      "aliases": [
+        "deps",
+        "dependencies",
+        "audit-deps"
+      ],
+      "title": "Inspect dependencies",
+      "summary": "Identify package manager and dependency risks without automatically changing versions.",
+      "risk": "read-only-unless-audit-uses-network",
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Identify package manager and lockfile; inspect direct dependency declarations."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Check project policy and available audit/report commands before running them."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Dependency updates, removals, and installs change the environment or lockfile; propose them before applying."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Separate confirmed findings, advisories, and unknowns in the report."
+        }
+      ]
+    },
+    {
+      "id": "cross-platform.command",
+      "title": "Cross-platform command",
+      "summary": "Select and validate a readable command for the detected operating system and shell.",
+      "risk": "read-only",
+      "aliases": [
+        "shell.detect",
+        "universal.command"
+      ],
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Detect OS, shell, working directory, and available tools."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Prefer native tools or project scripts before shell commands."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Review side effects and obtain required approval before mutation or external actions."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Execute through the host agent and verify the result."
+        }
+      ]
+    },
+    {
+      "id": "command.refactor",
+      "title": "Refactor long command",
+      "summary": "Explain a long shell command and propose a clearer equivalent without silently changing semantics.",
+      "risk": "approval-required",
+      "aliases": [
+        "cli.simplify",
+        "command.explain"
+      ],
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Parse logical stages, operators, quoting, redirection, and shell assumptions."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Compare native tools, API, project scripts, and structured argv."
+        },
+        {
+          "kind": "approval",
+          "purpose": "Review proposed behavior and approval boundaries before execution."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Verify equivalence and report limitations."
+        }
+      ]
+    },
+    {
+      "id": "agent.tool-selection",
+      "title": "Agent tool selection",
+      "summary": "Choose between agent-native tools, project scripts, CLI, API, and SDK.",
+      "risk": "read-only",
+      "aliases": [
+        "tool.choose",
+        "hybrid.optimize"
+      ],
+      "steps": [
+        {
+          "kind": "guidance",
+          "purpose": "Discover available native tools and project automation."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Compare reliability, permissions, portability, and output quality."
+        },
+        {
+          "kind": "guidance",
+          "purpose": "Choose the smallest reliable workflow and verify its result."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Scratch working area for superpowers plans (ledger, briefs, review packages)
+.superpowers/
+__pycache__/
+*.pyc

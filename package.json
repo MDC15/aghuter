@@ -1,0 +1,8 @@
+{
+  "name": "aghuter",
+  "version": "0.3.1",
+  "description": "Universal hybrid command intelligence skill for AI coding agents",
+  "license": "MIT",
+  "runtime": "Python 3 standard library",
+  "execution_policy": "helpers are non-executing; host agent controls execution"
+}
